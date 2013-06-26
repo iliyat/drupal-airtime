@@ -1,0 +1,58 @@
+<?
+
+function airtime_js_init()
+	{
+		/*для прямых кросс-доменных запросов, надо править эйртайм*/
+		drupal_add_js(drupal_get_path('module', 'airtime').'/js/api.airtime.js');
+	}
+
+
+function airtime_api_request($host, $method)
+	{
+		$json = file_get_contents($host.$method.'/');
+		//return $host;
+		return json_decode($json);
+		
+	}
+
+function airtime_menu()
+	{
+		$items = array();
+		$items['airtime/api'] = array(
+			'title' => 'Airtime API',
+			'type' => MENU_NORMAL_ITEM,
+			'page callback' => 'airtime_api',
+			'access callback' => 'user_access',
+    		'access arguments' => array('access content')
+		);
+		return $items;
+	}
+
+function airtime_api()
+	{
+		if(arg(2) != '')
+			{
+				if(arg(3)!= '')
+					{
+						//TODO: унифицировать выбор адреса airtime
+						$node = node_load(arg(3));
+						if($node->field_airtime_api['und'][0]['value'] != '')
+							{
+								$data = airtime_api_request($node->field_airtime_api['und'][0]['value'], arg(2));
+							}
+						else
+							{
+								$data['error'] = 'Airtime API not set in this chanel';
+							}
+					}
+				else
+					{
+						$data['error'] = "Select chanel ID";
+					}
+			}
+		else
+			{
+				$data['error'] = "Select API method";
+			}
+		return drupal_json_output($data);
+	}

@@ -1,0 +1,5 @@
+name = Airtime
+description = "Airtime API support"
+core = "7.x"
+package = "Airtime"
+
