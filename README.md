@@ -1,4 +1,4 @@
 airtime
 =======
 
-Get airtime shedule in drupal
+Airtime api for drupal. Week schedule, live information etc.
