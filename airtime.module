@@ -1,18 +1,21 @@
 <?
 
+/*
+ * live-info
+ * week-info
+ * schedule - расписание текущего шоу
+ * version - Airtime version, example 2.4.0
+ * status
+ * get-media/file/$file_id - возвращает файл для сохранения\просмотра
+ * 
+ */
+
+include('includes/airtime.base64.class.php');
+
 function airtime_js_init()
 	{
 		/*для прямых кросс-доменных запросов, надо править эйртайм*/
 		drupal_add_js(drupal_get_path('module', 'airtime').'/js/api.airtime.js');
-	}
-
-
-function airtime_api_request($host, $method)
-	{
-		$json = file_get_contents($host.$method.'/');
-		//return $host;
-		return json_decode($json);
-		
 	}
 
 function airtime_menu()
@@ -28,7 +31,7 @@ function airtime_menu()
 		return $items;
 	}
 
-function airtime_api()
+function airtime_api_old() /* вывод обращений к апи в пространстве друпала, что-то типа посредника*/
 	{
 		if(arg(2) != '')
 			{
@@ -38,7 +41,15 @@ function airtime_api()
 						$node = node_load(arg(3));
 						if($node->field_airtime_api['und'][0]['value'] != '')
 							{
-								$data = airtime_api_request($node->field_airtime_api['und'][0]['value'], arg(2));
+								
+								/*TODO передавать ключ как аргкмент в ссылке*/
+								
+								/* Указываем с какого хоста брать данные*/
+								$airtime = new Airtime($node->field_airtime_api['und'][0]['value']);
+								/* Устанавливаем  api_key, если есть*/
+								$airtime->api->api_key = $_GET['api_key'];
+								
+								$data = $airtime->api->get(arg(2));
 							}
 						else
 							{
@@ -54,5 +65,26 @@ function airtime_api()
 			{
 				$data['error'] = "Select API method";
 			}
+		
 		return drupal_json_output($data);
+	}
+
+function airtime_api()
+	{
+		if(arg(2) != '')
+			{
+				if($hash = base64_decode(arg(2)))
+					{
+						$options = json_decode($hash);
+						$node = node_load($options->nid);
+						if($node->field_airtime_api['und'][0]['value'] != '')
+							{
+								$options->host = $node->field_airtime_api['und'][0]['value'];
+								$airtime = new Airtime($options);
+								drupal_json_output($airtime->json());
+							}
+						
+						
+					}
+			}
 	}
