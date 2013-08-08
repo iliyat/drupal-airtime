@@ -28,13 +28,21 @@ class Airtime
 		private function getJSON()
 			{
 				//if(!$this->api_key) $this->api_key = '';
-				$json = file_get_contents($this->options->host.'/api/'.$this->options->method.'/?api_key='.$this->options->api_key);
-				$json = json_decode($json);
-				if(!$this->show_version)	
+				$json = @file_get_contents($this->options->host.'/api/'.$this->options->method.'/?api_key='.$this->options->api_key);
+			
+				if($json !== false)
 					{
-						unset($json->AIRTIME_API_VERSION);
+						$json = json_decode($json);
+						if(!$this->show_version)	
+							{
+								unset($json->AIRTIME_API_VERSION);
+							}
+						return $json;
 					}
-				return $json;
+				else
+					{
+						return false;
+					}
 			}
 		private function live_info()
 			{
