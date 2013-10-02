@@ -1,6 +1,7 @@
 <?
 
-/*
+/* Модуль в процессе создания, много лишних вещей.
+ * методы апи:
  * live-info
  * week-info
  * schedule - расписание текущего шоу
@@ -10,6 +11,7 @@
  * 
  */
 
+/* Пока используем вариант с шифрованием объекта с параметрами в base64*/
 include('includes/airtime.base64.class.php');
 
 function airtime_js_init()
