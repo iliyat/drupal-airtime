@@ -16,7 +16,7 @@ include('includes/airtime.base64.class.php');
 
 function airtime_js_init()
 	{
-		/*для прямых кросс-доменных запросов, надо править эйртайм*/
+		/*для прямых кросс-доменных запросов, надо править эйртайм (видимо придется от этого отказаться)*/
 		drupal_add_js(drupal_get_path('module', 'airtime').'/js/api.airtime.js');
 	}
 
