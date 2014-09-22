@@ -1,0 +1,8 @@
+name = Airtime API
+description = "Provide Airtime API"
+core = "7.x"
+package = "Airtime"
+version = VERSION
+
+files[] = includes/AirtimeClass.inc
+

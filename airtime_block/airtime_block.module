@@ -1,0 +1,55 @@
+<?
+
+/**
+ * @return array
+ * Implements hook_menu
+ */
+function airtime_block_menu()
+{
+	$items = array();
+	$items['admin/config/system/airtime-block'] = array(
+		'title' => t('Airtime block settings'),
+		'type' => MENU_NORMAL_ITEM,
+		'page callback' => 'airtime_block_settings',
+		'access callback' => 'user_access',
+		'access arguments' => array('administer site')
+	);
+	return $items;
+}
+
+function airtime_block_settings()
+{
+	return drupal_get_form('airtime_block_settings_form');
+}
+
+function airtime_block_settings_form()
+{
+	$form = array();
+
+	$form['host'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Airtime instance host. '),
+		'#description' => t('Host when your Airtime is running. Example - http://airtime-demo.sourcefabric.org'),
+		'#required' => true
+	);
+
+	$form['api_key'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Airtime API secret key. '),
+		'#description' => t('API key is created when installed Airtime. Need for "schedule" and "version" methods.')
+	);
+
+	$form['actions']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save settings')
+	);
+	return $form;
+}
+
+
+function airtime_block_js_init()
+{
+	/*для прямых кросс-доменных запросов, надо править эйртайм (видимо придется от этого отказаться)*/
+	drupal_add_js(drupal_get_path('module', 'airtime').'/js/api.airtime.js');
+}
+

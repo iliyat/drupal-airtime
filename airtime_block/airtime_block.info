@@ -1,0 +1,7 @@
+name = Airtime Info Block
+description = "Block with station info."
+core = "7.x"
+package = "Airtime"
+version = VERSION
+
+dependencies[] = airtime_api
