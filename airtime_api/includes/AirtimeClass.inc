@@ -25,12 +25,17 @@ class Airtime
 			{
 				if($key && !empty($this->api_key))
 				{
-					$json = file_get_contents($this->host.'/api/'.$method.'/?api_key='.$this->api_key);
+					$json = @file_get_contents($this->host.'/api/'.$method.'/?api_key='.$this->api_key);
 				}
 				else
 				{
-					$json = file_get_contents($this->host.'/api/'.$method);
+					$json = @file_get_contents($this->host.'/api/'.$method);
 				}
+
+                if($http_response_header[0] != 'HTTP/1.1 200 OK')
+                {
+                    return array('error' => 'Transport error: '.$http_response_header[0]);
+                }
 
 				if(!empty($json))
 					{
@@ -98,7 +103,7 @@ class Airtime
 					}
 			}
 		
-		public function get($method, $arg = false)
+		public function api($method, $arg = false)
 			{
 				switch ($method)
 					{

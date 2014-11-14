@@ -53,3 +53,13 @@ function airtime_block_js_init()
 	drupal_add_js(drupal_get_path('module', 'airtime').'/js/api.airtime.js');
 }
 
+function aritime_block_block_info()
+{
+	$blocks = array(
+		'airtime_block' => array(
+			'title' => t('Airtime')
+		)
+	);
+
+	return $blocks;
+}

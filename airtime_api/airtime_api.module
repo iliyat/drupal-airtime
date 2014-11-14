@@ -8,7 +8,7 @@ function airtime_api_menu()
 	{
 		$items = array();
 
-		$items['airtime/api'] = array(
+		$items['ajax/airtime/api'] = array(
 			'type' => MENU_CALLBACK,
 			'page callback' => 'airtime_api_handler',
 			'access callback' => 'user_access',
@@ -20,20 +20,20 @@ function airtime_api_menu()
 
 function airtime_api_handler()
 	{
-		if(arg(2) != '')
+		if(arg(3) != '')
 			{
-				$method = htmlspecialchars(arg(2));
+				$method = htmlspecialchars(arg(3));
 				$options = array(
 					'host' => 'http://airtime-demo.sourcefabric.org',
 					'api_key' => null
 				);
 				$airtime = new Airtime($options);
-				if(is_numeric(arg(3)))
+				if(is_numeric(arg(4)))
 				{
-					$arg = arg(3);
-					drupal_json_output($airtime->get($method, $arg));
+					$arg = arg(4);
+					drupal_json_output($airtime->api($method, $arg));
 				}
-				drupal_json_output($airtime->get($method));
+				drupal_json_output($airtime->api($method));
 			}
 	}
 
