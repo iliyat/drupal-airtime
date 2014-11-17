@@ -1,0 +1,9 @@
+<?
+/**
+ * Implements hook_uninstall()
+ */
+function airtime_api_uninstall()
+{
+	variable_del('airtime_api_host');
+	variable_del('airtime_api_key');
+}

@@ -15,6 +15,15 @@ function airtime_api_menu()
     		'access arguments' => array('access content')
 		);
 
+		$items['admin/config/services/airtime'] = array(
+			'title' => t('Airtime API settings'),
+			'type' => MENU_NORMAL_ITEM,
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('airtime_api_settings_form'),
+			'access callback' => 'user_access',
+			'access arguments' => array('administer site')
+		);
+
 		return $items;
 	}
 
@@ -23,17 +32,109 @@ function airtime_api_handler()
 		if(arg(3) != '')
 			{
 				$method = htmlspecialchars(arg(3));
-				$options = array(
-					'host' => 'http://airtime-demo.sourcefabric.org',
-					'api_key' => null
-				);
-				$airtime = new Airtime($options);
-				if(is_numeric(arg(4)))
+				if(airtime_api_config_check())
 				{
-					$arg = arg(4);
-					drupal_json_output($airtime->api($method, $arg));
+					$options = airtime_api_config();
+					$airtime = new Airtime($options);
+					if(is_numeric(arg(4)))
+					{
+						$arg = arg(4);
+						drupal_json_output($airtime->api($method, $arg));
+					}
+					drupal_json_output($airtime->api($method));
 				}
-				drupal_json_output($airtime->api($method));
+				else
+				{
+					/* if config check return false*/
+					drupal_json_output(array(
+						'error' => 'Airtime API not configured.'
+					));
+				}
 			}
 	}
 
+function airtime_api_settings_form()
+{
+	$form = array();
+
+	$form['airtime_api_host'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Airtime instance host. '),
+		'#description' => t('Host when your Airtime is running. Example - http://airtime-demo.sourcefabric.org'),
+		'#required' => true,
+		'#default_value' => variable_get('airtime_api_host')
+	);
+
+	$form['airtime_api_key'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Airtime API secret key. '),
+		'#description' => t('API key is created when installed Airtime. Need for "schedule" and "version" methods.')
+	);
+
+	$form['actions']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Save settings')
+	);
+
+	return $form;
+}
+
+function airtime_api_settings_form_submit($form, $form_state)
+{
+	$values = $form_state['values'];
+
+	if(!empty($values['airtime_api_host']))
+	{
+		variable_set('airtime_api_host', $values['airtime_api_host']);
+	}
+
+	if(!empty($values['airtime_api_key']))
+	{
+		variable_set('airtime_api_key', $values['airtime_api_key']);
+	}
+
+	drupal_set_message(t('Settings saved.'), 'status');
+}
+
+/**
+ * @param bool $key = false
+ * @return bool
+ */
+function airtime_api_config_check($key = false)
+{
+
+	if(variable_get('airtime_api_host'))
+	{
+		if($key) // check with key
+		{
+			if(variable_get('airtime_api_key'))
+			{
+				/* if host & key set */
+				return true;
+			}
+			else
+			{
+				/* if key no set */
+				return false;
+			}
+		}
+
+		/* if host set */
+		return true;
+	}
+
+	/* all wrong */
+	return false;
+}
+
+/**
+ * @return array
+ */
+function airtime_api_config()
+{
+	$options = array();
+	$options['host'] = variable_get('airtime_api_host');
+	$options['key'] = variable_get('airtime_api_key');
+
+	return $options;
+}

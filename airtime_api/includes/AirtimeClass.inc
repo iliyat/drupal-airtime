@@ -1,10 +1,13 @@
 <?
 
-
+/**
+ * Class Airtime
+ */
 class Airtime
 	{
 		protected $show_version = false;
 		protected $api_key;
+		protected $host;
 		
 		function __construct(array $options)
 			{
@@ -127,5 +130,9 @@ class Airtime
 					}	
 				
 			}
+		public function getHost()
+		{
+			return $this->host;
+		}
 	}
 

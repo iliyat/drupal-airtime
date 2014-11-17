@@ -1,9 +1,8 @@
 
+/*todo: rewrite on Drupal-way */
 function requestAPI(hash, callback){
-	
-	
 	jQuery.ajax({
-		url: '/airtime/api/'+hash,
+		url: 'ajax/airtime/api/'+hash,
 		type: 'GET',
 		dataType: 'json',
 		success: function(data){

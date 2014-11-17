@@ -1,65 +1,81 @@
 <?
 
 /**
+ * Implements hook_block_info().
  * @return array
- * Implements hook_menu
  */
-function airtime_block_menu()
-{
-	$items = array();
-	$items['admin/config/system/airtime-block'] = array(
-		'title' => t('Airtime block settings'),
-		'type' => MENU_NORMAL_ITEM,
-		'page callback' => 'airtime_block_settings',
-		'access callback' => 'user_access',
-		'access arguments' => array('administer site')
-	);
-	return $items;
-}
-
-function airtime_block_settings()
-{
-	return drupal_get_form('airtime_block_settings_form');
-}
-
-function airtime_block_settings_form()
-{
-	$form = array();
-
-	$form['host'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Airtime instance host. '),
-		'#description' => t('Host when your Airtime is running. Example - http://airtime-demo.sourcefabric.org'),
-		'#required' => true
-	);
-
-	$form['api_key'] = array(
-		'#type' => 'textfield',
-		'#title' => t('Airtime API secret key. '),
-		'#description' => t('API key is created when installed Airtime. Need for "schedule" and "version" methods.')
-	);
-
-	$form['actions']['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Save settings')
-	);
-	return $form;
-}
-
-
-function airtime_block_js_init()
-{
-	/*для прямых кросс-доменных запросов, надо править эйртайм (видимо придется от этого отказаться)*/
-	drupal_add_js(drupal_get_path('module', 'airtime').'/js/api.airtime.js');
-}
-
-function aritime_block_block_info()
+function airtime_block_block_info()
 {
 	$blocks = array(
 		'airtime_block' => array(
-			'title' => t('Airtime')
+			'info' => t('Airtime'),
+			'cache' => DRUPAL_NO_CACHE
 		)
 	);
 
 	return $blocks;
+}
+
+/**
+ *  Implements hook_block_view().
+ */
+function airtime_block_block_view($delta = '')
+{
+	$block = array();
+	if($delta == 'airtime_block')
+	{
+		if(airtime_api_config_check())
+		{
+			$block['subject'] = t('Airtime');
+			$block['content'] = airtime_block_contents();
+		}
+	}
+
+	return $block;
+}
+
+/**
+ * Implements hook_theme().
+ * @return mixed
+ */
+function airtime_block_theme()
+{
+	$theme['airtime_block'] = array(
+		'variables' => array(
+			'current_track' => null
+		),
+		'template' => 'theme/airtime_block--block'
+	);
+	return $theme;
+}
+
+function airtime_block_contents()
+{
+	$options = airtime_api_config();
+	$airtime = new Airtime($options);
+	$live = $airtime->api('live-info');
+
+	$output = array();
+
+	if($live)
+	{
+		if(!empty($live->current->name))
+		{
+			$output['current_track']= $live->current->name;
+		}
+
+		if(!empty($live->currentShow[0]->name))
+		{
+			$output['current_show'] = $live->currentShow[0]->name;
+		}
+
+		$output['station_link'] = l(t('Link to station'), $airtime->getHost(), array(
+			'attributes' => array(
+				'target' => '_blank'
+			))
+		);
+
+	}
+
+	return theme('airtime_block', $output);
 }

@@ -3,6 +3,7 @@ description = "Provide Airtime API"
 core = "7.x"
 package = "Airtime"
 version = VERSION
+php = 5.4
 
 files[] = includes/AirtimeClass.inc
 

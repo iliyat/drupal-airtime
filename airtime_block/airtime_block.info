@@ -1,7 +1,8 @@
 name = Airtime Info Block
-description = "Block with station info."
+description = "Example module working with Airtime API module. Block with station info."
 core = "7.x"
 package = "Airtime"
 version = VERSION
+php = 5.4
 
 dependencies[] = airtime_api
